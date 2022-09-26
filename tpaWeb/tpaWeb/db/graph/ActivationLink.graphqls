@@ -1,0 +1,13 @@
+type ActivationLink{
+    id: ID!
+    userID: String!
+}
+
+extend type Query{
+    getActivationLink(id:String!): ActivationLink!
+}
+
+extend type Mutation{
+    createActivationLink(userID: String!): ActivationLink!
+    createForgetLink(userEmail: String!): Any!
+}
