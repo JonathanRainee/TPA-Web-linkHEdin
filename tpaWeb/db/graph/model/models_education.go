@@ -10,5 +10,4 @@ type Education struct {
 	EndDate string `json:"end_date"`
 	Grade float64 `json:"grade"`
 	Activites string `json:"activites"`
-	Desctiption string `json:"description"`
 }

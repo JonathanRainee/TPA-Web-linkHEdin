@@ -2,12 +2,11 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-
-	"github.com/RaiNeOnMe/tpaWebb/service"
 )
 
-type authString string
+type  authString string
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r * http.Request){
@@ -17,18 +16,19 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
-
 		bearer := "Bearer"
 		auth = auth[len(bearer):]
 
-		validate, err := service.JwtValidate(context.Background(), auth)
+		validate, err := JwtValidate(context.Background(), auth)
+
+		// JwtValidate(context.Background(), auth)
 
 		if err != nil || !validate.Valid {
 			http.Error(w, "Wrong token", http.StatusForbidden)
 			return
 		}
 
-		customClaim, _ := validate.Claims.(*service.JwtCustomClaim)
+		customClaim, _ := validate.Claims.(*JwtCustomClaim)
 
 		ctx := context.WithValue(r.Context(), authString("auth"), customClaim)
 		r = r.WithContext(ctx)
@@ -36,7 +36,8 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func CTxValue(ctx context.Context) *service.JwtCustomClaim{
-	raw, _ := ctx.Value(authString("auth")).(*service.JwtCustomClaim)
+func CTxValue(ctx context.Context) *JwtCustomClaim{
+	raw, _ := ctx.Value(authString("auth")).(*JwtCustomClaim)
+	fmt.Printf(raw.ID)
 	return raw
 }

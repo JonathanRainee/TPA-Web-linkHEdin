@@ -5,9 +5,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { UploadProfilePicture } from "../util/ProfilepicUtil";
 import { UserAuth } from "../contexts/authContext";
 import "../styles/profileStyle.scss";
-import { FindUser, GetUsrByID, GetUsrEducation, GetUsrExperiences, RequestConnect, UpdateUser, UploadProfilePic } from "../queries/queryUser";
+import { FindUser, GetUsrByID, GetUsrEducation, GetUsrExperiences, RequestConnect, UpdateUser, UploadBgPic, UploadProfilePic, UserYouMightKnow, VisitUser } from "../queries/queryUser";
 import Navbar from "../components/Navbar";
-import { AiOutlinePlus } from 'react-icons/ai';
+import { AiOutlinePlus, AiFillEdit } from 'react-icons/ai';
 import { storage } from "../../firebase.config";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import ModalEducation from "../components/ModalEducation";
@@ -15,6 +15,11 @@ import EducationComp from "../components/EducationComp";
 import ModalExperience from "../components/ModalExperience";
 import ExperienceComp from "../components/ExperienceComp";
 import { RefetchContext } from "../contexts/refetch";
+import ModalUpdtUsername from "../components/ModalUpdtUsername";
+import UserInfoComp from "../components/UserInfoComp";
+import UserYMKCard from "../components/UserYMKCard";
+import UserYMKComp from "../components/UserYMKComp";
+import FooterComp from "../components/FooterComp";
 
 export default function Profile() {
     const { id } = useParams();
@@ -23,54 +28,90 @@ export default function Profile() {
     const navigate = useNavigate();
     const [ updateFunc ] = useMutation(UpdateUser)
     const [ uploadProfPic ] = useMutation(UploadProfilePic)
+    const [ uploadBgPic ] = useMutation(UploadBgPic)
     const [ eduToggle, setEduToggle ] = useState(false)
     const [ myProf, setMyProf ] = useState(false)
     const [ userEducations, setUserEducations ] = useState([])
     const [ userExperiences, setUserExperiences ] = useState([])
-    const { data, loading, error } = useQuery(GetUsrEducation, {variables:{UserID: userContext.user.id}})
+    // const { data, loading, error } = useQuery(GetUsrEducation, {variables:{UserID: userContext.user.id}})
     const [ progError, setProgError ] = useState(false)
     const [ userFetch, setUserFetch ] = useState(false)
     const [ eduFetch, setEduFetch ] = useState(false)
-
+    const [ usernameToggle, setUsernameToggle ] = useState(false)
     const [ expToggle, setExpToggle ] = useState(false)
+    let connectedUser: boolean = false
+    let connectionReq: boolean = false
+    let giveConnectStat: boolean = false
+    // console.log(userContext)
+    // console.log("asdfasdf")
 
     const [User, setUser] = useState({
         id:"",
         name: "",
         profile_picture_url: "https://firebasestorage.googleapis.com/v0/b/linkhedin-vt.appspot.com/o/profilePictures%2Fdefault.jpg?alt=media&token=140c66e3-a51d-47ae-aaef-00ad043d2bd0",
+        bg_pic_url: "",
         connect_request:[''],
         connected_user:['']
     })
 
+    const{loading, error, data, called, refetch: refetchCurrUser,} = useQuery(GetUsrByID, {variables: {UserID: id}, errorPolicy: "all"})
 
+    const [ visit, { loading: loadingVisit, error: errorVisit, data: dataVisit } ] = useMutation(VisitUser)
+
+    const { loading: loadingUserSuggestion, error: errorUserSuggestion, data: dataUserSuggestion, refetch: refetchUserSuggestion } = useQuery(UserYouMightKnow, {
+        variables: {
+            userId: userContext.user.id
+        }
+    })
+ 
+    // console.log(data.getUser)
+    const [ currUser, setCurrUser ] = useState()
+    const [ fCurrUser, setFCurrUser ] = useState(false)
     const refetchContext = RefetchContext()
-    const user = useQuery(GetUsrByID, {variables: {UserID: id}})
-    const educations = useQuery(GetUsrEducation, {variables: {UserID: User.id}})
-    const experiences = useQuery(GetUsrExperiences, {variables: {UserID: User.id}})
-    const [ reqConnect ] = useMutation(RequestConnect)
+    const user = useQuery(GetUsrByID, {variables: {UserID: id}, errorPolicy: "all"})
+    // console.log(userContext)
+    // const educations = useQuery(GetUsrEducation, {variables: {UserID: User.id}})
+    // const experiences = useQuery(GetUsrExperiences, {variables: {UserID: User.id}})
+    // const [ reqConnect ] = useMutation(RequestConnect)
+
+    
 
     useEffect(()=>{
         if(id === userContext.user.id){
             setMyProf(true)
+        }else{
+            setMyProf(false)
         }
-    })
+    }, [id])
 
-    useEffect(()=>{
-        if(!educations.loading && !educations.error){
-            // console.log(educations.data)
-            setUserEducations(educations.data.userEducation)
-        }
-    }, [ educations.loading, educations.data ])
+    // console.log(data.getUser)
+    // if(!loading){
+    //     console.log(data.getUser)
+        useEffect(() => {
+            if(dataVisit && data) {
+                // console.log(dataVisit)
+                if(dataVisit.VisitUser.length !== data.getUser.Visits.length){
+                    refetchCurrUser()
+                }
+            }
+        }, [loadingVisit, loading])
+    
+        useEffect(() => {
+            if(userContext.user.id !== id){
+                visit({
+                    variables: {
+                        id1: userContext.user.id,
+                        id2: id
+                    }
+                }).then((e) => {console.log("askdlfj")})
+            }
+        }, [])
+    // }
 
-    useEffect(()=>{
-        if(!experiences.loading && !experiences.error){
-            setUserExperiences(experiences.data.userExperience)
-        }
-    }, [experiences.loading, experiences.data])
-
-    const test = () =>{
-        console.log(educations)
-    }
+    // useEffect(()=>{
+    //     setCurrUser(data.getUser)
+    //     setFCurrUser(true)
+    // }, [])
 
     useEffect(()=>{
         if(user.error){
@@ -88,6 +129,9 @@ export default function Profile() {
 
     const handleProfPicChange = async (e:any) => {
         const newPP = e.target.files[0]
+        if(newPP === undefined){
+            alert("Please input a valid extension file")
+        }else{}
         const imgRef = ref(storage, 'ProfilePic/'+ newPP.name)
         uploadBytes(imgRef, newPP).then(() => {
             getDownloadURL(imgRef).then((data) => {
@@ -95,19 +139,46 @@ export default function Profile() {
                     variables:{
                         id: userContext.user.id,
                         newProfilePicture: data
-                }})
-                console.log(data)
-                // .then(() => {
-                //     user.refetch()
-                //     refetchContext.refreshUser()
-                // })
-                const updatedUsr = userContext.user
-                updatedUsr.profile_picture = data
+                }}).then(() => {
+                    user.refetch()
+                    // refetchContext.refreshUser()
+                    userContext.refetchUser()
+                })
+                // userContext.refetchUser()
+                // const updatedUsr = userContext.user
+                // updatedUsr.profile_picture = data
                 // console.log(updatedUsr)
-                userContext.setUser(updatedUsr)
+                // console.log("slesai")
+                // userContext.setUser(updatedUsr)
             })
         })
     }
+
+    const handleBgChange = async (e:any) => {
+        const newBGP = e.target.files[0]
+        const imgRef = ref(storage, 'BgPic/'+ newBGP.name)
+        uploadBytes(imgRef, newBGP).then(() => {
+            getDownloadURL(imgRef).then((data) => {
+                uploadBgPic({
+                    variables:{
+                        id: userContext.user.id,
+                        newBanner: data
+                }}).then(() => {
+                    user.refetch()
+                    // refetchContext.refreshUser()
+                    userContext.refetchUser()
+                })
+                // userContext.refetchUser()
+                // const updatedUsr = userContext.user
+                // updatedUsr.Backgroundpicture = data
+                // console.log(userContext.user)
+                // console.log(updatedUsr)
+                // userContext.setUser(updatedUsr)
+            })
+        })
+    }
+
+    // console.log(userContext.user)
 
     const toggleEdu = () => {
         setEduToggle(!eduToggle)
@@ -115,6 +186,10 @@ export default function Profile() {
     
     const toggleExp = () => {
         setExpToggle(!expToggle)
+    }
+
+    const toggleUsrname = () => {
+        setUsernameToggle(!usernameToggle)
     }
 
     useEffect(() => {
@@ -127,116 +202,247 @@ export default function Profile() {
         }
     }, [eduToggle])
     // console.log(user.data.getUser.name)
+    // console.log(userContext.user.profile_picture)
 
     // console.log()
-    // console.log(User)
+    // console.log(userContext.user)
     // console.log(User)
 
-    if(loading){
-        return (
-            <div>
-                kkontolll
-            </div>
+    useEffect(() => {
+        userContext.refetchUser()
+        refetchCurrUser()
+    }, [])
+    // console.log(data.getUser)
+
+    // console.log(data.getUser)
+    // useEffect(() => {
+    //     if(dataVisit && data) {
+    //         if(dataVisit.visitUser.length !== data.getUser.Visits.length){
+    //             refetchCurrUser()
+    //         }
+    //     }
+    // }, [loadingVisit, loading])
+
+    // useEffect(() => {
+    //     if(userContext.user.id !== id){
+    //         visit({
+    //             variables: {
+    //                 id1: userContext.user.id,
+    //                 id2: id
+    //             }
+    //         }).then((e) => {console.log("askdlfj")})
+    //     }
+    // }, [])
+
+    if(loadingVisit) {
+        return(
+            <div>Fetching data....</div>
         )
     }
+
+    if(errorVisit){
+        return(
+            <div>Error...</div>
+        )
+    }
+
+    if(loading){
+        console.log("afs")
+        return (
+            <div>
+                Fetching data123...
+            </div>
+        )
+    }else{
+        console.log("uda")
+        // useEffect(() => {
+        //     if(dataVisit && data) {
+        //         if(dataVisit.visitUser.length !== data.getUser.Visits.length){
+        //             refetchCurrUser()
+        //         }
+        //     }
+        // }, [loadingVisit, loading])
+    }
+
+    if(error){
+        return(
+            <div>Error...</div>
+        )
+    }
+
+    if(loadingUserSuggestion){
+        return(
+            <div>loading...</div>
+        )
+    }
+
+    // if(errorUserSuggestion){
+    //     return(
+    //         <div>error...</div>
+    //     )
+    // }
+
+    if(dataUserSuggestion === undefined){
+        console.log("gaad")
+    }else{
+        // console.log(dataUserSuggestion)
+        console.log("ada")
+    }
+    // console.log(dataUserSuggestion)
+    // if(errorUserSuggestion){
+    //     return(
+    //         <div>error...</div>
+    //     )
+    // }
+    // else{
+    //     console.log(data.getUser)
+    // }
+    // useEffect(() => {
+    //     if(dataVisit && data) {
+    //         if(dataVisit.visitUser.length !== data.getUser.Visits.length){
+    //             refetchCurrUser()
+    //         }
+    //     }
+    // }, [loadingVisit, loading])
+
+    // useEffect(() => {
+    //     if(userContext.user.id !== id){
+    //         visit({
+    //             variables: {
+    //                 id1: userContext.user.id,
+    //                 id2: id
+    //             }
+    //         }).then((e) => {})
+    //     }
+    // }, [])
+    // console.log(data.getUser.Visits.length)
+    // useEffect(() => {
+    //     if(dataVisit && data) {
+    //         if(dataVisit.visitUser.length !== data.getUser.Visits.length){
+    //             refetchCurrUser()
+    //         }
+    //     }
+    // }, [loadingVisit, loading])
+
+    // useEffect(() => {
+    //     if(userContext.user.id !== id){
+    //         visit({
+    //             variables: {
+    //                 id1: userContext.user.id,
+    //                 id2: id
+    //             }
+    //         }).then((e) => {})
+    //     }
+    // }, [])
+    
+
+    // console.log(data.getUser.Experiences)
+    // console.log(dataUserSuggestion.userSuggestion)
     
     return (
-        <div className='linkedin-bg fullscreen center-col'>
-            {eduToggle === true && (
-                <ModalEducation  refetch={educations.refetch} toggle={toggleEdu}></ModalEducation>
-            )}
-            {expToggle === true && (
-                <ModalExperience refetch={experiences.refetch} toggle={toggleExp}></ModalExperience>
-            )}
-            <Navbar></Navbar>
-            <div className='profile white-bg border-border'>
-                
-                {/* <img className='profile-picture' src={userContext.user.ProfilePicture} alt="" /> */}
-                <label htmlFor="file" onChange={(e)=>{handleProfPicChange(e)}}>
-                    <img className='profile-picture m-20 white-bg' src={userContext.user.ProfilePicture} alt="" />
-                </label>
-                <div className="ml-20">
-                    <p className='text-black mv-20 mb-min10 text-l'>{User.name}</p>
-                    {
-                        userExperiences.map((exp:any) => {
-                            if(exp.Active){
-                                return(
-                                    <p key={exp.ID} className='text-black mt-min10 mh-20 ph-10 text-m'>{exp.Description} at {exp.CompanyName}</p>
+        <div className="flex-row flex">
+            <div className='linkedin-bg fullscreen center-col flex'>
+                {eduToggle === true && (
+                    <ModalEducation toggle={toggleEdu}></ModalEducation>
+                )}
+                {expToggle === true && (
+                    <ModalExperience toggle={toggleExp}></ModalExperience>
+                )}
+                {/* {usernameToggle === true && (
+                    <ModalUpdtUsername refetch={user.refetch} toggle={toggleUsrname}></ModalUpdtUsername>
+                )} */}
+                <Navbar></Navbar>
+                <div>
+                    <UserInfoComp currentUser={data.getUser} refetchCurrentUser={refetchCurrUser} edit={myProf}></UserInfoComp>
+                    {/* <button onClick={test}>test</button> */}
+                    <div className='profile white-bg border-border'>
+                        <div className='flex-row w-full space-between'>
+                            <p className='text-black text-l bold'>Education</p>
+                            {
+                                myProf === true && (
+                                    <button className='add-button' onClick={toggleEdu}>
+                                        <AiOutlinePlus className='plus-logo' ></AiOutlinePlus>
+                                    </button>
                                 )
                             }
-                        })
-                    }
-
-                </div>
-                {(
-                    myProf != true && !User.connect_request.includes(userContext.user.id) && !User.connected_user.includes(userContext.user.id)) && (
-                        <div>
-                            <button onClick={()=>{reqConnect({variables:{id:userContext.user.id, recipient:User.id}}).then(()=>{user.refetch()})}}> Request Connect </button>
                         </div>
-                )}
-                {(
-                    myProf != true && User.connect_request.includes(userContext.user.id)) && (
-                        <div>
-                            <button className=""> Requested </button>
+                        {
+                            data.getUser.Educations.length === 0 && (
+                                <p className='text-black text-s w-full'>Empty</p>
+                            )
+                        }
+                        {
+                            data.getUser.Educations.map((edu:any)=>{
+                                return(
+                                    <EducationComp key = {edu.ID} myProf={myProf} education={edu}></EducationComp>
+                                )
+                            })
+                        }
+                    </div>
+                    <div className='profile white-bg border-border'>
+                        <div className='flex-row w-full space-between'>
+                            <p className='text-black text-l bold'>Experience</p>
+                            {
+                                myProf === true && (
+                                    <button className='add-button' onClick={toggleExp}>
+                                        <AiOutlinePlus className='plus-logo' ></AiOutlinePlus>
+                                    </button>
+                                )
+                            }
                         </div>
-                )}
-                {(
-                    myProf != true && User.connected_user.includes(userContext.user.id)) && (
-                        <div>
-                            <button className="white-button-s pt-min10"> Connected </button>
-                        </div>
-                )}
-                <input disabled={!myProf} className="display-none" type="file" name='file' id='file' onChange={(e)=>{handleProfPicChange(e)}}/>
-            </div>
-            {/* <button onClick={test}>test</button> */}
-            <div className='profile white-bg border-border'>
-                <div className='flex-row w-full space-between'>
-                    <p className='text-black text-l bold'>Education</p>
+                        {
+                            data.getUser.Experiences.length === 0 && (
+                                <p className='text-black text-s w-full'>Empty</p>
+                            )
+                        }
+                        {
+                            data.getUser.Experiences.map((exp:any)=>{
+                                return(
+                                    <ExperienceComp key = {exp.ID} myProf={myProf} experience={exp}></ExperienceComp>
+                                )
+                            })
+                        }
+                    </div>
                     {
-                        myProf === true && (
-                            <button className='add-button' onClick={toggleEdu}>
-                                <AiOutlinePlus className='plus-logo' ></AiOutlinePlus>
-                            </button>
+                        dataUserSuggestion !== undefined ? (
+                            <>
+                                <div>     
+                                    {
+                                        myProf ? (
+                                            <>
+                                                <div className='profile white-bg border-border'>
+                                                    <div className='flex-row w-full space-between'>
+                                                        <p className="text-black text-l bold">User you might know</p>
+                                                    </div>
+                                                    {
+                                                        // console.log(dataUserSuggestion)
+                                                        loadingUserSuggestion ? (
+                                                            <p>Loading...</p>
+                                                        ) : !errorUserSuggestion ? (
+                                                            <>
+                                                                {/* <p>ada</p> */}
+                                                                {/* <UserYMKComp userSuggestionData={dataUserSuggestion.userSuggestion[0]}></UserYMKComp> */}
+                                                                <UserYMKCard userSuggestionData={dataUserSuggestion.userSuggestion}> </UserYMKCard>
+                                                            </>
+                                                        ) : (
+                                                            <p>-</p>
+                                                        )
+                                                    }
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div></div>
+                                        )
+                                    }
+                                </div>
+                            </>
+                        ) : (
+                            <div></div>
                         )
                     }
                 </div>
-                {
-                    userEducations.length === 0 && (
-                        <p className='text-black text-s w-full'>Empty</p>
-                    )
-                }
-                {
-                    userEducations.map((edu:any)=>{
-                        return(
-                            <EducationComp key = {edu.ID} myProf={myProf} education={edu} refetch={educations.refetch}></EducationComp>
-                        )
-                    })
-                }
             </div>
-            <div className='profile white-bg border-border'>
-                <div className='flex-row w-full space-between'>
-                    <p className='text-black text-l bold'>Experience</p>
-                    {
-                        myProf === true && (
-                            <button className='add-button' onClick={toggleExp}>
-                                <AiOutlinePlus className='plus-logo' ></AiOutlinePlus>
-                            </button>
-                        )
-                    }
-                </div>
-                {
-                    userExperiences.length === 0 && (
-                        <p className='text-black text-s w-full'>Empty</p>
-                    )
-                }
-                {
-                    userExperiences.map((exp:any)=>{
-                        return(
-                            <ExperienceComp key = {exp.ID} myProf={myProf} experience={exp} refetch={experiences.refetch}></ExperienceComp>
-                        )
-                    })
-                }
-            </div>
+            <FooterComp></FooterComp>
         </div>
     );
 }

@@ -25,16 +25,19 @@ function ResetPass() {
     })
 
 
-    const reset = () =>{
+    const reset = (e: any) =>{
+        e.preventDefault()
         if(!loading){
+            console.log("uda ad")
             const userID = data.getActivationLink.userID
 
             if(pass !== confPass){
                 console.log(userID)
                 alert("Password and confirmation password didn't match")
+            }else if(pass.length === 0){
+                alert("Please fill the password!")
             }else{
-                ResetPasswords(
-                    {variables:
+                ResetPasswords({variables:
                         {
                             id:userID, 
                             newPass: pass
@@ -43,7 +46,6 @@ function ResetPass() {
                 ).then(() => {
                     console.log("password changed")
                     navigate('/')
-                    alert("suc")
                 }).catch((err) => {
                     console.log(err)
                 })
@@ -53,7 +55,7 @@ function ResetPass() {
 
     return (
         <div className='fullscreen'>
-            <div className="box" id='main'>
+            <div className="" id='main'>
                 <img src={Logo} alt="" className='logo' />
                 <div className="App" id='main'>
                     <form action="" className='form-forget'>
@@ -61,7 +63,6 @@ function ResetPass() {
                         <input onChange={(e)=>setPass(e.target.value)} className='inp text-input' type="password" placeholder='Password'/>
                         <input onChange={(e)=>setConfPass(e.target.value)} className='inp text-input' type="password" placeholder='Confirm password'/>
                         <button onClick={reset} className='btn si btnBlue blue-button'>Reset</button>
-                        
                     </form>
                 </div>
                 <div className='footer'>

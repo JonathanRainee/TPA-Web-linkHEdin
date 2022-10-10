@@ -32,7 +32,7 @@ export default function ModalExperience(parameter: any){
                 Description: desc 
             }
         }).then(()=>{
-            parameter.refetch()
+            userContext.refetchUser()
             parameter.toggle()
         })
     }

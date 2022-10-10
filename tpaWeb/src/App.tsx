@@ -13,11 +13,18 @@ import { ApolloClient, InMemoryCache, ApolloProvider, gql, ApolloLink, createHtt
 import AuthContextProvider, { UserAuth } from './contexts/authContext'
 import { ProtectedRoute, UnprotectedRoute} from './contexts/middleware'
 import RefetchContextProvider from './contexts/refetch'
+import useLocalStorage from './contexts/useLocalStrg'
+import JobPage from './pages/JobPage'
+import NotifPage from './pages/NotifPage'
+import MessagePage from './pages/MessagePage'
+import SearchPage from './pages/SearchPage'
 
 const Protected = () => {
   return(
     <ProtectedRoute>
-      <Outlet></Outlet>
+      <AuthContextProvider>
+        <Outlet></Outlet>
+      </AuthContextProvider>
     </ProtectedRoute>
   )
 }
@@ -35,12 +42,14 @@ function App(){
 
   const main_url = "http://localhost:4444";
   const url = main_url + "/query";
+  const [ token, setToken ] = useLocalStorage("token", "")
+  console.log(token)
 
   const authLink = new ApolloLink((operation:any, forward:any)=>{
-    if(userContext.user && userContext.token!==undefined){
+    if(token !== undefined && Object.keys(token).length !== 0){
       operation.setContext({
         headers:{
-          Authorization: `Bearer ${userContext.token}`,
+          Authorization: `Bearer ${token}`,
         }
       })
     }
@@ -73,6 +82,10 @@ function App(){
             <Route path='/home' element = {<Home />}></Route>
             <Route path='/Profile/:id' element = {<Profile />}></Route>
             <Route path='/network' element = {<NetworkPage />}></Route>
+            <Route path='/job' element = {<JobPage/>}></Route>
+            <Route path='/notification' element = {<NotifPage />}></Route>
+            <Route path='/message' element = {<MessagePage />}></Route>
+            <Route path='/search/:text' element = {<SearchPage />}></Route>
           </Route>
         </Routes>
         

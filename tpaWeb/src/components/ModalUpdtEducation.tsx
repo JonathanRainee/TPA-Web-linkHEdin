@@ -37,7 +37,8 @@ export default function ModalUpdtEducation(parameter: any) {
                 }
             }
         ).then(()=>{
-            parameter.refetch()
+            // parameter.refetch()
+            userContext.refetchUser()
             parameter.toggle()
         })
     }
@@ -45,10 +46,6 @@ export default function ModalUpdtEducation(parameter: any) {
     function test(){
         console.log(currID, userContext.user.id, school, degree, studyField, start, end, grade, activites, desc)
     }
-
-    
-
-    
 
     return (
         <div className='modal center-all'>

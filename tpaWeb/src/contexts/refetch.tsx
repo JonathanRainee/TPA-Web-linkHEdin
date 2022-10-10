@@ -7,12 +7,13 @@ const Refetcher = createContext(null as any)
 
 export default function RefetchContextProvider({children}: any){
     const userContext = UserAuth()
-    const user = useQuery(GetUsrByID, {variables: {UserID: userContext.user.id}})
+    // const user = useQuery(GetUsrByID, {variables: {UserID: userContext.user.id}})
 
     const refreshUser = () => {
-        user.refetch().then((x) => {
-            userContext.setUser(x.data.getUser)
-        })
+        // user.refetch().then((x) => {
+        //     userContext.setUser(x.data.getUser)
+        // })
+        console.log("asf")
     }
 
     return(

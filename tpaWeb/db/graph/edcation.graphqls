@@ -1,6 +1,6 @@
 type Education {
     ID: ID!
-    UserID: String!
+    UserID: ID!
     School: String!
     Degree: String!
     FieldOfStudy: String!
@@ -8,7 +8,6 @@ type Education {
     EndDate: String!
     Grade: Float!
     Activites: String!
-    Description: String!
 }
 
 input newEducation {
@@ -20,7 +19,6 @@ input newEducation {
     EndDate: String!
     Grade: Float!
     Activites: String!
-    Description: String!
 }
 
 extend type Query {
@@ -29,7 +27,7 @@ extend type Query {
 }
 
 extend type Mutation{
-    createEducation(input: newEducation!): String!
-    updateEducation(id: String!, input: newEducation!): String!
-    deleteEducation(id: String!): String!
+    createEducation(input: newEducation!): Education!
+    updateEducation(id: ID!, input: newEducation!): Education!
+    deleteEducation(id: ID!): Education!
 }

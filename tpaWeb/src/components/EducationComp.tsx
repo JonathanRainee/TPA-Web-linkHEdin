@@ -2,11 +2,13 @@ import { useMutation } from '@apollo/client'
 import React, { useState } from 'react'
 import {AiFillEdit} from 'react-icons/ai'
 import {BiTrash} from 'react-icons/bi'
+import { UserAuth } from '../contexts/authContext'
 import { DelEdu } from '../queries/queryUser'
 import '../styles/logRes.scss'
 import ModalUpdtEducation from './ModalUpdtEducation'
 
 export default function EducationComp(parameter:any) {
+    const userContext = UserAuth()
     const [delEdu] = useMutation(DelEdu)
     const [ updtEduToggle, setUpdtEduToggle ] = useState(false)
 
@@ -20,7 +22,7 @@ export default function EducationComp(parameter:any) {
                 id: parameter.education.ID
             }
         }).then(()=>{
-            parameter.refetch()
+            userContext.refetchUser()
         })
     }
 

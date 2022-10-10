@@ -8,9 +8,9 @@ import { UserAuth } from './contexts/authContext'
 import AuthContextProvider from './contexts/authContext'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <AuthContextProvider>
+  // <AuthContextProvider>
     <BrowserRouter>
         <App />
     </BrowserRouter>
-  </AuthContextProvider>
+  // </AuthContextProvider>
 )

@@ -8,6 +8,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/RaiNeOnMe/tpaWebb/config"
+	"github.com/RaiNeOnMe/tpaWebb/directives"
 	"github.com/RaiNeOnMe/tpaWebb/graph"
 	"github.com/RaiNeOnMe/tpaWebb/graph/generated"
 	"github.com/RaiNeOnMe/tpaWebb/graph/model"
@@ -42,18 +43,34 @@ func main() {
 	// db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	
 	db := config.GetDB()
-	db.AutoMigrate(&model.User{})
-	db.AutoMigrate(&model.ActivationLink{})
-	db.AutoMigrate(&model.Education{})
-	db.AutoMigrate(&model.Experience{})
+	db.AutoMigrate(
+		&model.User{},
+		&model.ActivationLink{},
+		&model.Education{},
+		&model.Experience{},
+		&model.Post{},
+		&model.ConnectRequest{},
+		&model.Connection{},
+		&model.Comment{},
+		&model.LikeComment{},
+		&model.Hashtag{},
+		&model.Job{},
+		&model.Notification{},
+	)
+	// db.AutoMigrate(&model.ActivationLink{})
+	// db.AutoMigrate(&model.Education{})
+	// db.AutoMigrate(&model.Experience{})
+
 
 	// if err != nil {
 	// 	panic(err)
 	// }
-
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
+	c := generated.Config{Resolvers: &graph.Resolver{
 		DB: db,
-	}}))
+	}}
+	c.Directives.Auth = directives.Auth
+
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(c))
 
 	router := mux.NewRouter()
 	router.Use(MyCors)

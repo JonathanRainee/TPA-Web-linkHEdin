@@ -2,10 +2,58 @@
 
 package model
 
+import (
+	"time"
+)
+
+type Block struct {
+	UserID  string `json:"userId"`
+	BlockID string `json:"blockId"`
+}
+
+type CreateJob struct {
+	Title          string `json:"title"`
+	CompanyName    string `json:"companyName"`
+	Workplace      string `json:"workplace"`
+	City           string `json:"city"`
+	Country        string `json:"country"`
+	EmploymentType string `json:"employmentType"`
+	Description    string `json:"description"`
+}
+
+type Hashtag struct {
+	ID      string `json:"id"`
+	Hashtag string `json:"hashtag"`
+}
+
+type InputPost struct {
+	SenderID string `json:"senderId"`
+	Text     string `json:"text"`
+	PhotoURL string `json:"photoUrl"`
+	VideoURL string `json:"videoUrl"`
+}
+
+type Job struct {
+	ID             string    `json:"id"`
+	Title          string    `json:"title"`
+	CompanyName    string    `json:"companyName"`
+	Workplace      string    `json:"workplace"`
+	City           string    `json:"city"`
+	Country        string    `json:"country"`
+	EmploymentType string    `json:"employmentType"`
+	Description    string    `json:"description"`
+	CreatedAt      time.Time `json:"createdAt"`
+}
+
 type NewUser struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type Search struct {
+	Users []*User `json:"Users"`
+	Posts []*Post `json:"Posts"`
 }
 
 type UpdateUser struct {
@@ -23,7 +71,6 @@ type NewEducation struct {
 	EndDate      string  `json:"EndDate"`
 	Grade        float64 `json:"Grade"`
 	Activites    string  `json:"Activites"`
-	Description  string  `json:"Description"`
 }
 
 type NewExperience struct {

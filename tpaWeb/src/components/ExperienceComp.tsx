@@ -2,10 +2,12 @@ import { useMutation } from '@apollo/client'
 import React, { useState } from 'react'
 import { AiFillEdit } from 'react-icons/ai'
 import { BiTrash } from 'react-icons/bi'
+import { UserAuth } from '../contexts/authContext'
 import { DelExp } from '../queries/queryUser'
 import ModalUpdtExperience from './ModalUpdtExperience'
 
 export default function ExperienceComp(parameter: any){
+    const userContext = UserAuth()
     const [ del ] = useMutation(DelExp)
     const [ updtExpToggle, setUpdtExpToggle ] = useState(false)
 
@@ -19,8 +21,12 @@ export default function ExperienceComp(parameter: any){
                 id:parameter.experience.ID
             }
         }).then(()=>{
-            parameter.refetch()
+            userContext.refetchUser()
         })
+        console.log(parameter.experience.ID)
+    }
+
+    const test = () =>{
         console.log(parameter.experience.ID)
     }
 

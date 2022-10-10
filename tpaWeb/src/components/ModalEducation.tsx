@@ -18,11 +18,22 @@ export default function ModalEducation(parameter: any) {
     const [ activites, setActivities ] = useState("")
     const [ desc, setDesc ] = useState("")
 
-    function test(){
+    // function test(){
+    //     console.log(userContext.user.id, school, degree, studyField, start, end, grade, activites, desc)
+    // }
+
+    const test = () => {
         console.log(userContext.user.id, school, degree, studyField, start, end, grade, activites, desc)
+
     }
 
+    // console.log(userContext)
+
     const handleCreateEducation = () =>{
+        if(school === "" || degree === "" || studyField === "" || start === "" || end === "" || activites === "" || desc === ""){
+            alert("Please fill all of the required fields")
+            return
+        }
         createEduc({
             variables:{
                 UserID: userContext.user.id,
@@ -33,9 +44,10 @@ export default function ModalEducation(parameter: any) {
                 EndDate: end,
                 Grade: grade,
                 Activities: activites,
-                Description: desc
+                Description: desc,
             }}).then(()=>{
-                parameter.refetch()
+                // parameter.refetch()
+                userContext.refetchUser()
                 parameter.toggle()
             })
     }

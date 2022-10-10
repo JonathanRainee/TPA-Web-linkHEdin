@@ -1,6 +1,6 @@
 type Experience {
     ID: ID!
-	UserID: String!
+	UserID: ID!
 	Title: String!
 	EmploymentType: String! 
 	CompanyName: String! 
@@ -13,7 +13,7 @@ type Experience {
 }
 
 input newExperience {
-    UserID: String!
+    UserID: ID!
 	Title: String!
 	EmploymentType: String! 
 	CompanyName: String! 
@@ -30,7 +30,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    createExperience(input: newExperience!): String!
-    updateExperience(id: ID!, input: newExperience!): String!
-    deleteExperience(id: ID!): String!
+    createExperience(input: newExperience!): Experience!
+    updateExperience(id: ID!, input: newExperience!): Experience!
+    deleteExperience(id: ID!): Experience!
 }

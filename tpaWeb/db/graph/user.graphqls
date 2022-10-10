@@ -3,9 +3,10 @@
 # https://gqlgen.com/getting-started/
 
 directive @auth on FIELD_DEFINITION
+directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 
-scalar Time
 scalar Any
+scalar Date
 
 type User {
   id: ID!
@@ -15,15 +16,21 @@ type User {
   verified: Boolean!
   ProfilePicture: String!
   Backgroundpicture: String!
-  followed_user: [String!]!
-  connected_user: [String!]!
-  connect_request: [String!]!
+  Visits: [Visit!]! @goField(forceResolver: true)
+  Follows: [Follow!]! @goField(forceResolver: true)
+  Blocks: [Block!] @goField(forceResolver: true)
+  Connections: [Connection!]! @goField(forceResolver: true)
+  ConnectRequests: [ConnectRequest!]! @goField(forceResolver: true)
+  Experiences: [Experience!]! @goField(forceResolver: true)
+  Educations: [Education!]! @goField(forceResolver: true)
 }
 
 type Query {
   user(id: ID!): User! 
   users: [User!]!
   getUser(id: ID!): User!
+  getUserByEmail(email: String!): User!
+  userSuggestion(userId: ID!): [User!]!
 }
 
 input NewUser {
@@ -38,13 +45,30 @@ input UpdateUser {
   ProfilePicture: String!
 }
 
+type Visit {
+    userId: ID!
+    visitId: ID!
+}
+
+type Follow{
+    userId:ID!
+    followId:ID!
+}
+
 type Mutation {
   Login(email: String!, password: String!): Any!
+  LoginWOPass(email: String!): Any!
   Register(input: NewUser!): Any!
   ActivateAcount(id: ID!): Any!
   ResetPass(id: String!, newPass: String!): String!
   UpdateUser(id: ID!, input: UpdateUser!): User!
   UploadProfilePicture(id: ID!, newProfilePicture: String!): String!
+  UploadBannerPicture(id: String!, newBanner: String!): String!
   AcceptReqConnect(id: String!, senderID: String!): String!
   ReqConnect(id: String!, recipientID: String!): String!
+  IgnoreConnect(id: String!, senderID: String!): String!
+  Follow(id1: ID!, id2: ID!): Any!
+  Unfollow(id1: ID!, id2: ID!): Any!
+  UpdateUsername(id: String!, newUsername: String!): String!
+  VisitUser(id1: ID!, id2: ID!): Any!
 }

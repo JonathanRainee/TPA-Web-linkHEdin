@@ -48,7 +48,7 @@ function ForgotPass() {
 
     return (
         <div className='fullscreen'>
-            <div className="box" id='main'>
+            <div className="" id='main'>
                 <img src={Logo} alt="" className='logo' />
                 <div className="App" id='main'>
                     <form action="" className='form-forget'>
