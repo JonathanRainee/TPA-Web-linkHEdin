@@ -5,6 +5,13 @@ import { UserAuth } from '../contexts/authContext';
 const MessageListComp = ({ roomData }: any) => {
     const UserContext = UserAuth()
     const navigate = useNavigate()
+    console.log(roomData)
+
+    function redir(){
+        navigate(`${roomData.id}`)
+        console.log("redir")
+    }
+
 
     return (
         // <div>MessageListComp</div>
@@ -13,10 +20,10 @@ const MessageListComp = ({ roomData }: any) => {
                 return(
                     <div key={index}>
                         {roomData.user1.id === UserContext.user.id ? (
-                            <div onClick={() => navigate(`${roomData.id}`)} className="cursor-pointer content-user">
+                            <div onClick={()=>navigate(`${roomData.id}`)} className="cursor-pointer content-user">
                                 <div className='flex-row'>
                                     <div className='mr-2'>
-                                        <img src={roomData.user2.ProfilePicture} className="" alt="" />
+                                        <img src={roomData.user2.ProfilePicture} className="message-profile-pic" alt="" />
                                     </div>
                                     <div className=''>
                                         <p className='cursor-pointer'>{roomData.user2.name}</p>
@@ -38,7 +45,7 @@ const MessageListComp = ({ roomData }: any) => {
                             <div onClick={() => navigate(`${roomData.id}`)} className="content-user cursor-pointer">
                                 <div className='flex-row'>
                                     <div className='mr-2'>
-                                        <img src={roomData.user1.ProfilePicture} alt="" />
+                                        <img src={roomData.user1.ProfilePicture} alt="" className='message-profile-pic' />
                                     </div>
                                     <div>
                                         <p className='cursor-pointer'>{roomData.user1.name}</p>

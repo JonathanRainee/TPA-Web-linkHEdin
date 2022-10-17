@@ -409,6 +409,15 @@ export const DeleteBlock = gql `
         }
     }
 `
+
+export const Blocks = gql`
+    query Blocks($userId: ID!) {
+        blocks(userId: $userId) {
+            userId
+            blockId
+        }
+    }
+`
 //connection
 
 //follow
@@ -586,6 +595,17 @@ export const CreateHashtag = gql `
 
 
 // connect
+export const UserConnected = gql`
+    query UserConnected($userId: ID!) {
+        UserConnected(userId: $userId) {
+            id
+            name
+            ProfilePicture
+            Backgroundpicture
+        }
+    }
+`
+
 export const CreateConnect = gql `
     mutation CreateConnect($user1ID: ID!, $user2ID: ID!){
         addConnection(user1ID: $user1ID, user2ID: $user2ID){
@@ -1151,7 +1171,7 @@ export const QueryNotif = gql`
 
 //message
 export const Rooms = gql`
-    query rooms($userId: ID!) {
+    query Rooms($userId: ID!) {
         rooms(userId: $userId) {
             id
             user1 {
@@ -1179,7 +1199,7 @@ export const Rooms = gql`
 `
 
 export const Room = gql`
-    query room($roomId: ID!) {
+    query Room($roomId: ID!) {
         room(roomId: $roomId) {
             id
             user1 {
@@ -1211,7 +1231,29 @@ export const Room = gql`
                     name
                     ProfilePicture
                 }
-                
+                SharePost{
+                    id
+                    text
+                    photoUrl
+                    videoUrl
+                    Sender{
+                        id
+                        name
+                        ProfilePicture
+                    }
+                }
+                ShareProfile{
+                    id
+                    name
+                    email
+                    ProfilePicture
+                    Visits{
+                        userId
+                    }
+                    Connections{
+                        id
+                    }
+                }
             }
         }
     }

@@ -20,6 +20,8 @@ const ConnectReqComp = ({ connection }: any) => {
         navigate(`/profile/${connection.fromUser.id}`)
     }
 
+    // console.log(connection)
+
     if (connection.fromUser.id === UserContext.user.id) {
         userTrue = false;
     }
@@ -40,10 +42,10 @@ const ConnectReqComp = ({ connection }: any) => {
                 UserContext.refetchUser()
                 alert("Success")
             }).catch((e) => {
-                alert(e)
+                alert("gblh")
             })
         }).catch((e) => {
-            alert(e)
+            alert("gblh2")
         })
     }
 
@@ -73,10 +75,10 @@ const ConnectReqComp = ({ connection }: any) => {
                                 <FiArrowUpRight onClick={goProf} className='icon-sug ml-10'></FiArrowUpRight>
                             </button>
                             <div>
-                                <button onClick={() => acceptConnectionHandler(connection.id, connection.id, UserContext.user.id)} className='blue-button-xs ml-10'>Accept</button>
+                                <button onClick={() => acceptConnectionHandler(connection.fromUser.id, connection.fromUser.id, UserContext.user.id)} className='blue-button-xs ml-10'>Accept</button>
                             </div>
                             <div>
-                                <button onClick={() => ignoreConnectionHandler(connection.id, UserContext.user.id)} className='red-button-xs ml-10'>Ignore</button>
+                                <button onClick={() => ignoreConnectionHandler(connection.fromUser.id, UserContext.user.id)} className='red-button-xs ml-10'>Ignore</button>
                             </div>
                         </div>
                     </div>

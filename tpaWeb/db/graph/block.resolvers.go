@@ -21,3 +21,14 @@ func (r *mutationResolver) DeleteBlock(ctx context.Context, userID string, block
 	// panic(fmt.Errorf("not implemented"))
 	return service.DeleteBlock(r.DB, ctx, userID, blockID)
 }
+
+// Blocks is the resolver for the blocks field.
+func (r *queryResolver) Blocks(ctx context.Context, userID string) ([]*model.Block, error) {
+	// panic(fmt.Errorf("not implemented"))
+	var modelBlocks []*model.Block
+
+	if err := r.DB.Table("user_blocks").Where("user_id = ?", userID).Or("block_id = ?", userID).Find(&modelBlocks).Error; err != nil {
+		return nil, err
+	}
+	return modelBlocks, nil
+}

@@ -46,12 +46,14 @@ func GetUserByEmail(ctx context.Context, email string) (*model.User, error) {
 
 func GetUserById(ctx context.Context, id string) (*model.User, error) {
 	db := config.GetDB()
-	var user model.User
-	err := db.Model(user).Where("id LIKE ?", id).Take(&user).Error
-	if err != nil {
-		return nil, err
-	}
-	return &user, nil
+	// err := db.Model(user).Where("id LIKE ?", id).Take(&user).Error
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// return &user, nil
+
+	user := new(model.User)
+	return user, db.Find(&user, "id = ?", id).Error
 }
 
 func UploadProfilePicture(ctx context.Context, id string, newProfilePicture string) (string, error) {
@@ -76,7 +78,7 @@ func UploadBgPicture(ctx context.Context, id string, newBanner string) (string, 
 	return "Background picture Updated successfuly", nil
 }
 
-func UpdateUsername(ctx context.Context, id string, newUsername string) (string, error){
+func UpdateUsername(ctx context.Context, id string, newUsername string) (string, error) {
 	user, err := GetUserById(ctx, id)
 	db := config.GetDB()
 
@@ -117,7 +119,7 @@ func UnfollowUser(db *gorm.DB, ctx context.Context, id1 string, id2 string) (int
 		return map[string]interface{}{
 			"length": len(modelFollows),
 		}, nil
-	}else{
+	} else {
 		db.Table("user_follows").Delete(&follow, "user_id = ? AND follow_id = ?", id1, id2)
 		var modelFollows []*model.Follow
 		db.Table("user_follows").Find(&modelFollows, "follow_id = ?", id2)

@@ -1,14 +1,18 @@
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import React, {useState} from 'react'
 import { AiFillEdit } from 'react-icons/ai'
 import { storage } from '../../firebase.config'
 import { UserAuth } from '../contexts/authContext'
+import { BsFillShareFill } from 'react-icons/bs';
 import { refectUserType } from '../model/formModel'
 import { UserType } from '../model/model'
 import "../styles/profileStyle.scss"
-import { CreateBlock, CreateConnect, CreateConnectReq, CreateNotif, DeleteBlock, DeleteConnectReq, FollowUser, UnfollowUser, UploadBgPic, UploadProfilePic } from '../queries/queryUser'
+import { Blocks, CreateBlock, CreateConnect, CreateConnectReq, CreateNotif, DeleteBlock, DeleteConnectReq, FollowUser, Rooms, UnfollowUser, UploadBgPic, UploadProfilePic } from '../queries/queryUser'
 import ModalUpdtUsername from './ModalUpdtUsername'
+import { useNavigate } from 'react-router-dom'
+import ModalShare from './ModalShare'
+import ModalShareProf from './ModalShareProf'
 
 const UserInfoComp = ({ currentUser, refetchCurrentUser, edit} : any) => {
     
@@ -27,6 +31,8 @@ const UserInfoComp = ({ currentUser, refetchCurrentUser, edit} : any) => {
     const [ block ] = useMutation(CreateBlock)
     const [ unblock ] = useMutation(DeleteBlock)
     const [ createNotif ] = useMutation(CreateNotif)
+    const [shareModal, setShareModal] = useState(false)
+    const navigate = useNavigate()
 
 
     let alreadyConnected: boolean = false
@@ -34,6 +40,25 @@ const UserInfoComp = ({ currentUser, refetchCurrentUser, edit} : any) => {
     let giveConnectionStatus: boolean = false
     let alreadyFollowed: boolean = false
     let alreadyBlocked: boolean = false
+
+    // console.log("curr "+currentUser)
+    console.log(currentUser);
+
+    const { loading, error, data, startPolling } = useQuery(Rooms, {
+        variables: { userId: UserContext.user.id },
+    })
+
+    const {
+        loading: loadingBLock,
+        data: dataBlock,
+        startPolling: startPollingBlock,
+    } = useQuery(Blocks, { variables: { userId: UserContext.user.id } });
+    
+    if(!data || ! dataBlock){
+        return(
+            <div>loading...</div>
+        )
+    }
 
     const handleProfPicChange = async (e:any) => {
         const newPP = e.target.files[0]
@@ -249,7 +274,15 @@ const UserInfoComp = ({ currentUser, refetchCurrentUser, edit} : any) => {
             alert(e)
         })
     }
-    // console.log(currentUser)
+
+    function goMsg(){
+        console.log("masuk")
+        navigate('/message')
+    }
+
+    const handleShowModal = () => {
+        setShareModal(true)
+    }
 
     UserContext.user.Connections.map((dataConnect: any)=>{
         if(dataConnect.user1.id === currentUser.id || dataConnect.user2.id === currentUser.id){
@@ -296,6 +329,10 @@ const UserInfoComp = ({ currentUser, refetchCurrentUser, edit} : any) => {
 
     return (
         <div className='main-profile white-bg border-border relative'>
+            <>
+                {
+                    shareModal === true && <ModalShareProf profData={currentUser} roomData={data} userBlockData={dataBlock} closeModal={setShareModal}></ModalShareProf>
+                }
                 <div className="w-120 flex-col white-bg" style={{backgroundImage: "url("+currentUser.Backgroundpicture+")", backgroundSize:"100% 100%",  backgroundRepeat:"no-repeat", borderRadius:"15px 15px 0 0"}}>
                     {/* <img src=userContext.user.Backgroundpicture alt="" /> */}
                     {modalUser === true && (
@@ -322,6 +359,7 @@ const UserInfoComp = ({ currentUser, refetchCurrentUser, edit} : any) => {
                 {/* <img className='profile-picture' src={userContext.user.ProfilePicture} alt="" /> */}
                 <div className="ml-20 flex-row">
                     <p className='text-black mv-30 mb-min10 text-l ml-20'>{currentUser.name}</p>
+                    <BsFillShareFill onClick={ ()=>setShareModal(true) } className='ml-10 mt-20 cursor-pointer'></BsFillShareFill>
                     {
                         edit == true && (
                             <AiFillEdit onClick={toggleUsrname}  className='icon mt-20 ml-10'></AiFillEdit>
@@ -340,6 +378,11 @@ const UserInfoComp = ({ currentUser, refetchCurrentUser, edit} : any) => {
                                     {alreadyConnected && (
                                         <div>
                                             <button className='blue-button-xs' disabled>Connected</button>
+                                        </div>
+                                    )}
+                                    {alreadyConnected && (
+                                        <div>
+                                            <button onClick={() => goMsg()} className='blue-button-xs ml-10 zzz'>Message</button>
                                         </div>
                                     )}
                                     {alreadyRequested && (
@@ -422,6 +465,7 @@ const UserInfoComp = ({ currentUser, refetchCurrentUser, edit} : any) => {
                 )} */}
                 <input disabled={!edit} className="display-none" type="file" name='file' id='file' onChange={(e)=>{handleProfPicChange(e)}}/>
                 <input disabled={!edit} className="display-none" type="file" name='bgpic' id='bgpic' onChange={(e)=>{handleBgChange(e)}}/>
+            </>
             </div>
     )
 }

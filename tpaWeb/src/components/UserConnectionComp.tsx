@@ -8,11 +8,11 @@ const UserConnectionComp = ({ connection }: any) => {
     const userContext = UserAuth()
     let userTrue = true
     const navigate = useNavigate();
-
+    console.log(connection)
     const goProf = () => {
-        console.log(connection)
+        // console.log(connection)
         // console.log(`${userSuggestionData.id}`)
-        // navigate(`/profile/${connection.fromUser.id}`)
+        navigate(`/profile/${connection.user2.id}`)
     }
 
     if (connection.user1.id === userContext.user.id) {
@@ -21,7 +21,7 @@ const UserConnectionComp = ({ connection }: any) => {
 
 
     return (
-        <div className='YMK-card'>
+        <div className='YMK-card mb-10'>
             {userTrue ? ( 
                 <div className="card-suggest flex-row">
                     <img className='YMK2-img' src={connection.user1.ProfilePicture} alt="" />
@@ -42,7 +42,7 @@ const UserConnectionComp = ({ connection }: any) => {
                     <div className='mb-10 ml-20 pt-10'>
                         <div className='flex-row'>
                             <p className='text-black text-l'>{connection.user2.name}</p>
-                            <button className='transparent-btn'>
+                            <button onClick={goProf} className='transparent-btn'>
                                 <FiArrowUpRight className='icon-sug ml-10'></FiArrowUpRight>
                             </button>
                             <div>

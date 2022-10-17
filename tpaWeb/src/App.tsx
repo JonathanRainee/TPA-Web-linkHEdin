@@ -18,6 +18,7 @@ import JobPage from './pages/JobPage'
 import NotifPage from './pages/NotifPage'
 import MessagePage from './pages/MessagePage'
 import SearchPage from './pages/SearchPage'
+import SpecPostPage from './pages/SpecPostPage'
 
 const Protected = () => {
   return(
@@ -84,8 +85,9 @@ function App(){
             <Route path='/network' element = {<NetworkPage />}></Route>
             <Route path='/job' element = {<JobPage/>}></Route>
             <Route path='/notification' element = {<NotifPage />}></Route>
-            <Route path='/message' element = {<MessagePage />}></Route>
+            <Route path='/message/*' element = {<MessagePage />}></Route>
             <Route path='/search/:text' element = {<SearchPage />}></Route>
+            <Route path='/post/:id' element = {<SpecPostPage />}></Route>
           </Route>
         </Routes>
         

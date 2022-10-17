@@ -13,6 +13,7 @@ export default function ModalPost(parameter:any){
     const [ Photo, setPhoto ] = useState('')
     const [ Video, setVideo ] = useState('')
     const [ text, setText] = useState('')
+    const [removeFileStyle, setRemoveFileStyle] = useState("hidden");
 
     const [create] = useMutation(CreatePost)
     const [ createHash ] = useMutation(CreateHashtag)
@@ -85,8 +86,8 @@ export default function ModalPost(parameter:any){
     }
 
     const removeFileHandler = () => {
-        setText("")
-        setVideo("")
+        setPhoto('')
+        setVideo('')
     }
 
     const mentionDatas: SuggestionDataItem[] = []
@@ -147,6 +148,7 @@ export default function ModalPost(parameter:any){
                     <label htmlFor="photo">
                         <MdInsertPhoto className='icon'></MdInsertPhoto>
                     </label>
+                    <button onClick={removeFileHandler} className='cursor-pointer mh-30 transparent-btn'>X</button>
                     <input onChange={(e)=>{uploadVid(e)}} style={{display:'none'}} type="file" name="video" id="video" />
                     <input onChange={(e)=>{uploadPhoto(e)}} style={{display:'none'}} type="file" name="photo" id="photo" />
                 </div>

@@ -56,6 +56,8 @@ func main() {
 		&model.Hashtag{},
 		&model.Job{},
 		&model.Notification{},
+		&model.Room{},
+		&model.Message{},
 	)
 	// db.AutoMigrate(&model.ActivationLink{})
 	// db.AutoMigrate(&model.Education{})

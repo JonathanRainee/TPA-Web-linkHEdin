@@ -22,7 +22,7 @@ const MentionModalComp = ({ userId }: any) => {
             <div className="modal-mention-container">
                 <div className="modal-mention-content-container">
                     <div className="modal-mention-left-content">
-                        <img src={data.getUser.ProfilePicture}></img>
+                        <img src={data.getUser.ProfilePicture} className="profile-pic-connect"></img>
                     </div>
                     <div className="modal-mention-right-content">
                         <p className="modal-mention-username">

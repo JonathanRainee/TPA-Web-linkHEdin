@@ -229,6 +229,30 @@ const CommentComp = ({commentId,  commentReply, totalComment, setTotalComment, d
         }
     }
 
+    console.log(dataReply)
+    
+
+    const handleFetchMore = () => {
+        fectMoreReply({
+            variables:{ Offset: dataReply.repliedToComments.length, Limit: 2, commentId: commentId},
+            updateQuery: (previousResult, { fetchMoreResult }) => {
+                if(previousResult.repliedToComments.length + fetchMoreResult.repliedToComments.length === totalCommentReply){
+                    setHasMore(false)
+                }
+                if(fetchMoreResult.repliedToComments.length === 0){
+                    return previousResult
+                }else{
+                    return{
+                        QueryReplyComment: [
+                            ...previousResult.repliedToComments,
+                            ...fetchMoreResult.repliedToComments,
+                        ]
+                    }
+                }
+            }
+        }).then((e) => {}).catch((e) => {setHasMore(false)})
+    }
+
     const pressHandleEnter = (event: any, postId: string) => {
         console.log(event.key);
         if (event.key === "Enter") {
@@ -273,7 +297,7 @@ const CommentComp = ({commentId,  commentReply, totalComment, setTotalComment, d
                 <div className='w-full comment-content'>
                     <div className='pb-min10'>
                         <p className='text-black text-m bold'>{dataComment.postComment?.Commenter.name}</p>
-                        <p><TemplateRichText texts={texts}></TemplateRichText></p>
+                        <p className='mt-20'><TemplateRichText texts={texts}></TemplateRichText></p>
                     </div>
                     <div className='flex-row'>
                         { 
@@ -319,8 +343,8 @@ const CommentComp = ({commentId,  commentReply, totalComment, setTotalComment, d
                         }
                         {
                             displayInputComment === "flex" && hasMore == true && (
-                                <div>
-                                    <button>Load more reply</button>
+                                <div className='ml-20'>
+                                    <button onClick={handleFetchMore} className='blue-button-reply ml-40'>Load more</button>
                                 </div>
                             )
                         }

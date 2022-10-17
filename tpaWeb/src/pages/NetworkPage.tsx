@@ -12,7 +12,7 @@ import { UserYouMightKnow } from '../queries/queryUser'
 export default function NetworkPage(){
     const userContext = UserAuth()
     // console.log(userContext)
-    console.log(userContext.user.Connections)
+    // console.log(userContext.user.Connections)
 
     const { loading: loadingUserSuggestion, error: errorUserSuggestion, data: dataUserSuggestion, refetch: refetchUserSuggestion } = useQuery(UserYouMightKnow, {
         variables: {

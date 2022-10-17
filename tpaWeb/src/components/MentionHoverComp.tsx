@@ -15,9 +15,9 @@ const MentionHoverComp = ({ text }: { text: string }) => {
 
     return (
         // <div>MentionHoverComp</div>
-        <span style={{ position: "relative"}}>
+        <span >
             {modalMention === true && <MentionModalComp userId={userIdSubString}/>}    
-            <Link  
+            <Link  className='richText-a'
                 // onMouseOver={() => setModalMention(true)} 
                 // onMouseLeave={() => setModalMention(false)} 
                 to = {`/Profile/${userIdSubString}`}>

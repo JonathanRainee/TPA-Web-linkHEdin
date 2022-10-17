@@ -23,7 +23,7 @@ extend type Mutation {
     addMessageSharePost(senderId:ID!, roomId:ID!, SharePostId:ID! ) : Message!
     addMessageShareProfile(senderId:ID!, roomId:ID!, ShareProfileId:ID!) : Message!
 }
-
+    
 extend type Query {
     room(roomId:ID!): Room!
     rooms(userId:ID!) : [Room!]!

@@ -86,7 +86,7 @@ export default function Navbar(){
                     <NavLink to={'/profile/'+userContext.user.id} onMouseEnter={()=>{setDropDown(true)}} onMouseLeave={()=>{setDropDown(false)}} className= {handleActivePage}>
                         {/* <BsPersonCircle className='navbar-icon'></BsPersonCircle> */}
                         <img src={userContext.user.ProfilePicture} className='navbar-picture'></img>
-                        <h6 className='item-label'>{userContext.user.name}</h6>
+                        <h6 className='item-label2'>{userContext.user.name}</h6>
                         {dropDown && (
                             <div className='dropdown'>
                                 <div onClick={logOut}>Logout</div>

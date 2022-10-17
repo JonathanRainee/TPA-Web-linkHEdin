@@ -103,7 +103,7 @@ export default function Profile() {
                         id1: userContext.user.id,
                         id2: id
                     }
-                }).then((e) => {console.log("askdlfj")})
+                }).then((e) => {})
             }
         }, [])
     // }
@@ -247,7 +247,7 @@ export default function Profile() {
     }
 
     if(loading){
-        console.log("afs")
+        // console.log("afs")
         return (
             <div>
                 Fetching data123...

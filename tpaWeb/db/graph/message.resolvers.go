@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/RaiNeOnMe/tpaWebb/graph/generated"
@@ -26,6 +27,9 @@ func (r *messageResolver) SharePost(ctx context.Context, obj *model.Message) (*m
 	if err := r.DB.Find(&modelPost, "id = ?", obj.SharePostID).Error; err != nil {
 		return nil, err
 	}
+
+	fmt.Println("-------------------")
+	fmt.Println(modelPost.Sender)
 	return modelPost, nil
 }
 
@@ -104,8 +108,11 @@ func (r *queryResolver) Room(ctx context.Context, roomID string) (*model.Room, e
 // Rooms is the resolver for the rooms field.
 func (r *queryResolver) Rooms(ctx context.Context, userID string) ([]*model.Room, error) {
 	// panic(fmt.Errorf("not implemented"))
+	// println("kontohll")
 	var modelRooms []*model.Room
-	if err := r.DB.Order("created_at desc").Where("user1_id = ?", userID).Or("user2_id = ?", userID).Find(&modelRooms).Error; err != nil {
+	if err := r.DB.Find(&modelRooms).Where("user1_id = ?", userID).Or("user2_id = ?", userID).Find(&modelRooms).Error; err != nil {
+		// .Where("user1_id = ?", userID).Or("user2_id = ?", userID).Find(&modelRooms).Error; err != nil {
+		println("masuk sini")
 		return nil, err
 	}
 	return modelRooms, nil

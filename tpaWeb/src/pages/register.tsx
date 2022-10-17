@@ -20,6 +20,14 @@ function Register(){
 
     const regis = (e:any) => {
         e.preventDefault()
+
+        if(email || pass || username === "" ){
+            alert("Please fill all required field")
+            return
+        }else if(!email.endsWith("@gmail.com")){
+            alert("Please input a valid email address")
+            return
+        }
         registerAcc(
             {
                 variables:{
@@ -61,9 +69,9 @@ function Register(){
                             </Link>
                         </div>
                     </form>
-                    {error === true && (
+                    {/* {error === true && (
                         <p>email already exist</p>
-                    )}
+                    )} */}
                 </div>
                 <div className='footer'>
                 <p>footer</p>

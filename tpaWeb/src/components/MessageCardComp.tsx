@@ -1,10 +1,13 @@
 import React from 'react'
 
 const MessageCardComp = ({ messageData }: any) => {
+
+    console.log(messageData);
+    
     return (
         <div>
-            <div className='flex-row'>
-                <img src={messageData.sender.ProfilePicture} className="" alt="" />
+            <div className='flex-row ml-10 mb-20 mt-10'>
+                <img src={messageData.sender.ProfilePicture} className="message-profile-pic border-black" alt="" />
                 <div className='text-s ml-5'>
                     <div>
                         {messageData.sender.name}

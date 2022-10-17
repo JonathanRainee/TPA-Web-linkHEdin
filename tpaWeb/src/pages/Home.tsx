@@ -16,7 +16,7 @@ function Home(){
     const [ loding, setLoding ] = useState(true)
     const [ postToggle, setPostToggle ] = useState(false)
     const [hasMorePost, setHasMorePost] = useState(true)
-
+    console.log(userContext)
     const { loading: loadingPost, data: dataPost, error: errorPost, refetch: refetchPost, fetchMore, networkStatus } = useQuery(QueryPost, {
         variables: {
             userId: userContext.user.id,
@@ -32,8 +32,6 @@ function Home(){
         // console.log(dataPost.Posts[0])
     }
     
-    // console.log(userContext)
-
     useEffect(() => {
         refetchPost()
     }, [])
@@ -44,7 +42,7 @@ function Home(){
 
     if(!dataPost || !dataHashtag){
         return(
-            <div>loadingzzz...</div>
+            <div className='center-all mb-10 mt-10'>loadingzzz...</div>
         )
     }
 
@@ -92,6 +90,8 @@ function Home(){
                                 <p>empty</p>
                             ) : (
                                 dataPost.Posts.map((post: any) => {
+                                    console.log(post);
+                                    
                                     let initialValueTotalComment = post.Comments.length
                                     post.Comments.map((comment: any) => {
                                         initialValueTotalComment -= comment.Replies.length
@@ -106,18 +106,20 @@ function Home(){
                         {/* <div className="lds-ring"><div></div><div></div><div></div><div></div></div> */}
                         {
                             networkStatus === 3 && (
-                                <Oval
-                                    height={80}
-                                    width={80}
-                                    color="#000000"
-                                    wrapperStyle={{}}
-                                    wrapperClass=""
-                                    visible={true}
-                                    ariaLabel='oval-loading'
-                                    secondaryColor="#000000"
-                                    strokeWidth={2}
-                                    strokeWidthSecondary={2}
-                                />
+                                <div className='center-all mb-10 mt-10'>
+                                    <Oval
+                                        height={80}
+                                        width={80}
+                                        color="#000000"
+                                        wrapperStyle={{}}
+                                        wrapperClass=""
+                                        visible={true}
+                                        ariaLabel='oval-loading'
+                                        secondaryColor="#000000"
+                                        strokeWidth={2}
+                                        strokeWidthSecondary={2}
+                                    />
+                                </div>
                             )
                         }
                     </div>

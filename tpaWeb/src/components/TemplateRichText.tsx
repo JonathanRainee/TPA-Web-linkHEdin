@@ -19,26 +19,26 @@ const TemplateRichText = ({ texts }: { texts: string[] }) => {
             
                     let hastagUrl = text.substring(firstIndexHastag + 2, lastIndexHastag);
                     return (
-                        <Link className="" to={`/search/${hastagUrl}`} key={index}>
+                        <Link className='richText-a' to={`/search/${hastagUrl}`} key={index}>
                             {hastagSubString}{" "}
                         </Link>
                     );
                 } else if (text.match(HashtagRichText1)) {
                     let hastagUrl = text.substring(1, text.length);
                     return (
-                        <Link className="" to={`/search/${hastagUrl}`} key={index}>
+                        <Link className='richText-a' to={`/search/${hastagUrl}`} key={index}>
                             {text}{" "}
                         </Link>
                     );
                 } else if (text.match(URLRichText)) {
                     return (
-                        <a href={text} key={index}>
+                        <a className='richText-a' href={text} key={index}>
                             {text}{" "}
                         </a>
                     );
                 } else if (text.match(MentionRichText)) {
                     // return <p>d</p>;
-                    return <MentionHoverComp text={text} key = {index}/>
+                    return <MentionHoverComp text={text}  key ={index}/>
                     // incomplete
                 } else {
                     return <span key={index}>{text} </span>;

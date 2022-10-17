@@ -27,6 +27,10 @@ function ForgotPass() {
 
     const send = (e:any) => {
         e.preventDefault()
+        if(!email.endsWith("@gmail.com")){
+            alert("Please input a valid email address")
+            return
+        }
         sendLink(
             {
                 variables:{

@@ -2,14 +2,16 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import React, {useState} from 'react'
 import { AiFillLike } from 'react-icons/ai';
 import { BiCommentDetail } from 'react-icons/bi';
+import { BsFillShareFill } from 'react-icons/bs';
 import { Mention, MentionsInput, SuggestionDataItem } from 'react-mentions';
 import { useNavigate } from 'react-router-dom';
 import { UserAuth } from '../contexts/authContext';
 import { HashtagRichText1 } from '../mod/RichText';
-import { CreateComment, CreateHashtag, CreateLikePost, CreateNotif, QueryCommentPost } from '../queries/queryUser';
+import { Blocks, CreateComment, CreateHashtag, CreateLikePost, CreateNotif, QueryCommentPost, Rooms } from '../queries/queryUser';
 import '../styles/logRes.scss'
 import { mentionStyle } from '../util/helper';
 import CommentComp from './CommentComp';
+import ModalShare from './ModalShare';
 import TemplateRichText from './TemplateRichText';
 
 const PostComp = ({  initialValueTotalComment, dataHashtags, refetchHashtag, postData, refectPostData } : any) => {
@@ -40,12 +42,23 @@ const PostComp = ({  initialValueTotalComment, dataHashtags, refetchHashtag, pos
     const [limit, setLimit] = useState(2);
     const [offset, setOffset] = useState(0);
     const [comment, setComment] = useState("")
+    const [shareModal, setShareModal] = useState(false)
     const [commentInput, setCommentInput] = useState("")
     const [inputText, setInputText] = useState("")
 
     const toggleComment = () =>[
         setopenComments(!openComments)
     ]
+
+    const { loading, error, data, startPolling } = useQuery(Rooms, {
+        variables: { userId: userContext.user.id },
+    })
+
+    const {
+        loading: loadingBLock,
+        data: dataBlock,
+        startPolling: startPollingBlock,
+    } = useQuery(Blocks, { variables: { userId: userContext.user.id } });
 
     const [ addLike ] = useMutation(CreateLikePost)
 
@@ -54,7 +67,6 @@ const PostComp = ({  initialValueTotalComment, dataHashtags, refetchHashtag, pos
     // }
 
     // const [ commentQuery, { data: dataComment, fetchMore: fecthMoreComment, loading: loadingComment, error: errorComment} ]  = useQuery(QueryReplyComment)
-
 
     const likeHandler = () => {
         addLike({
@@ -170,6 +182,10 @@ const PostComp = ({  initialValueTotalComment, dataHashtags, refetchHashtag, pos
         )
     }
 
+    const handleShowModal = () => {
+        setShareModal(true)
+    }
+
     // console.log(dataComment)
 
     const fetchMoreComment = () => {
@@ -274,11 +290,14 @@ const PostComp = ({  initialValueTotalComment, dataHashtags, refetchHashtag, pos
 
     return( 
         <div className='post white-bg border-border center-col box2 flex-col'>
+            {
+                shareModal === true && <ModalShare postData={postData} roomData={data.rooms} userBlockData={dataBlock.blocks} closeModal={setShareModal}></ModalShare>
+            }
             <div className="w-full flex-row borderB">
                 <img onClick={()=>{navigate(`/profile/${postData.Sender.id}`)}} src={postData.Sender.ProfilePicture} className="homepage-picture mh-10 mv-10" alt="" />
                 <div className="w-full flex-row">
                     <span className="text-black text-m bold mh-10">{postData.Sender.name}</span>
-                    <p><TemplateRichText texts={texts}></TemplateRichText></p>
+                    <p className=''><TemplateRichText texts={texts}></TemplateRichText></p>
                     {/* <span className="text-black mh-10 text-s">{postData.text}</span> */}
                 </div>
             </div>
@@ -291,17 +310,22 @@ const PostComp = ({  initialValueTotalComment, dataHashtags, refetchHashtag, pos
             <div className="w-full flex-row mv-10 borderT">
                 <div className="mh-20 center-row">
                     {!postData.Likes.includes(userContext.user.id)&&(
-                        <AiFillLike onClick={likeHandler} className=""/>
+                        <AiFillLike onClick={likeHandler} className="mt-12"/>
                     )}
                     {postData.Likes.includes(userContext.user.id)&&(
-                        <AiFillLike onClick={fump} className=" "/>
+                        <AiFillLike onClick={fump} className=" mt-12"/>
                     )}
                     <p className="text-black text-s mh-10 ">{postData.Likes.length}</p>
                 </div>
                 <div className=" center-row">
                     <BiCommentDetail onClick={ (e) => {toggleComment()
-                                                        handleCommentShow()}} className=""/> 
-                    <p className="text-black text-s mh-10 ">{postData.Comments.length}</p>
+                                                        handleCommentShow()}} className="mt-14"/> 
+                    <p className="text-black text-s mh-10  ">{postData.Comments.length}</p>
+                </div>
+                <div>
+                    <BsFillShareFill onClick={ ()=>setShareModal(true) } className='ml-10 cursor-pointer'>
+
+                    </BsFillShareFill>
                 </div>
             </div>
             {
@@ -340,7 +364,7 @@ const PostComp = ({  initialValueTotalComment, dataHashtags, refetchHashtag, pos
                             })
                         }
                         {displayInputComment === "flex" && hasMore == true && (
-                            <div className='mb-2 ml-10'>
+                            <div className='mb-2 ml-20'>
                                 <button className='send-button2' onClick={fetchMoreComment}>Load more comment</button>
                             </div>
                         )}

@@ -96,11 +96,11 @@ const PostReplyComp = ({ replyId }: { replyId: string }) => {
                             <p>
                                 {data.postComment?.Commenter.name}
                             </p>
-                            <p className='lol'>
+                            <p className='mt-10'>
                                 <TemplateRichText texts={text}/>
                             </p>
                         </div>
-                        <div className='mb-min10'>
+                        <div className='mb-min10 mt-10'>
                             {checkUserLikes === false ? (
                                 <div className='flex-row items-center'>
                                     <p className="cursor-pointer" onClick={handleLike}>

@@ -351,6 +351,39 @@ func (r *queryResolver) UserSuggestion(ctx context.Context, userID string) ([]*m
 	return users, nil
 }
 
+// UserConnected is the resolver for the UserConnected field.
+func (r *queryResolver) UserConnected(ctx context.Context, userID string) ([]*model.User, error) {
+	// panic(fmt.Errorf("not implemented"))
+	var modelUsers []*model.User
+
+	var userIdList []string
+	var connection1 []*model.Connection
+	var connection2 []*model.Connection
+
+	if err := r.DB.Find(&connection1, "user1_id", userID).Error; err != nil {
+		return nil, err
+	}
+	if err := r.DB.Find(&connection2, "user2_id", userID).Error; err != nil {
+		return nil, err
+	}
+
+	connection1Ids := lo.Map(connection1, func(connectionData *model.Connection, _ int) string {
+		return connectionData.User2ID
+	})
+	connection2Ids := lo.Map(connection2, func(connectionData *model.Connection, _ int) string {
+		return connectionData.User1ID
+	})
+
+	userIdList = append(userIdList, connection1Ids...)
+	userIdList = append(userIdList, connection2Ids...)
+	userIdList = lo.Uniq(userIdList)
+
+	if err := r.DB.Find(&modelUsers, userIdList).Error; err != nil {
+		return nil, err
+	}
+	return modelUsers, nil
+}
+
 // Visits is the resolver for the Visits field.
 func (r *userResolver) Visits(ctx context.Context, obj *model.User) ([]*model.Visit, error) {
 	// panic(fmt.Errorf("not implemented"))
